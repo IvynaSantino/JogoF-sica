@@ -25,10 +25,14 @@ tela = pygame.display.set_mode((LARGURA, ALTURA),0,32)
 imagem_fundo = pygame.image.load("espacoFormat.jpg")
 
 
-foguete_imagem = "foguete3.png"
-foguete = pygame.image.load(foguete_imagem).convert_alpha()
-
-foguete_posicao = [40, 300]
+foguete = {
+	'surface': pygame.image.load('foguete3.png').convert_alpha(),
+	'position': [40, 300],
+	'speed': {
+		'x': 0,
+		'y': 0
+	}
+}
 
 # NOME DO JOGO: NAO SEI AINDA!
 pygame.display.set_caption('SIMULADOR DE CARGA')
@@ -42,26 +46,40 @@ def criarMeteoro():
 		'speed': randrange(9)
 	}
 	
-mAmarelo = []
+listaMeteoros = []
 
 def mover_meteoros():
-	for meteoro in mAmarelo:
+	for meteoro in listaMeteoros:
 		meteoro['position'][0] -= meteoro['speed']
 
 
 def remove_meteoros():
-	for meteoro in mAmarelo:
+	for meteoro in listaMeteoros:
 		if meteoro['position'][0] > 750:
-			mAmarelo.remove(meteoro)
+			listaMeteoros.remove(meteoro)
 			
 velocidade_meteoroA = 120
 
+
+# INICIANDO A CARGA DO FOGUETE
+cargaInicial = 10.0
+def conservacaoDeCargas(cargaInicial):
+	
+	cargaConservada = 0
+	cargaLivre = randrange(0,50)
+	
+	cargaInicial = (cargaLivre + cargaInicial)/2.0 
+	cargaConservada = cargaInicial
+	return cargaConservada
+	
+	
 
 # MOVIMENTAÇÃO DO JOGO
 clock = pygame.time.Clock()
 
 while True:
-	velocidade = {
+	
+	foguete['speed'] = {
 	'x': 0,
 	'y': 0
 	}
@@ -69,10 +87,12 @@ while True:
 	for event in pygame.event.get():
 		if event.type == QUIT:
 			exit()
+	
+	print conservacaoDeCargas(cargaInicial)
 			
 	if not velocidade_meteoroA:
 		velocidade_meteoroA = 120
-		mAmarelo.append(criarMeteoro())
+		listaMeteoros.append(criarMeteoro())
 	else:
 		velocidade_meteoroA -= 1
 		
@@ -84,42 +104,41 @@ while True:
 		break
 	
 	if pressed_keys[K_UP]:
-		velocidade['y'] = -10
+		foguete['speed']['y'] = -10
 		
 	elif pressed_keys[K_DOWN]:
-		velocidade['y'] = 10
+		foguete['speed']['y'] = 10
 		
 	if pressed_keys[K_LEFT]:
-		velocidade['x'] = -10
+		foguete['speed']['x'] = -10
 		
 	elif pressed_keys[K_RIGHT]:
-		velocidade['x'] = 10
+		foguete['speed']['x'] = 10
 		
 	tela.blit(imagem_fundo, (0, 0))
 	
 	# MOVIMENTO DO FOGUETE
-	foguete_posicao[0] += velocidade['x']
-	foguete_posicao[1] += velocidade['y']
+	foguete['position'][0] += foguete['speed']['x']
+	foguete['position'][1] += foguete['speed']['y']
 	
 	# NÃO ULTRAPASSAR A TELA
-	if foguete_posicao[0] > 550:
-		foguete_posicao[0] -= 10
+	if foguete['position'][0] > 550:
+		foguete['position'][0] -= 10
 		
-	if foguete_posicao[0] < 5:
-		foguete_posicao[0] += 10
+	if foguete['position'][0] < 5:
+		foguete['position'][0] += 10
 		
-	if foguete_posicao[1] > 500:
-		foguete_posicao[1] -= 10
+	if foguete['position'][1] > 500:
+		foguete['position'][1] -= 10
 		
-	if foguete_posicao[1] < 10:
-		foguete_posicao[1] += 10
+	if foguete['position'][1] < 10:
+		foguete['position'][1] += 10
 		
-		
-	tela.blit(foguete, foguete_posicao)
-	
+	# INICIAR FOGUETE NA POSIÇÃO 40 x 300 NA TELA
+	tela.blit(foguete['surface'], foguete['position'])
 	mover_meteoros()
 	
-	for meteoro in mAmarelo:
+	for meteoro in listaMeteoros:
 		tela.blit(meteoro['surface'], meteoro['position'])
 		
 	pygame.display.update()
