@@ -16,6 +16,10 @@ from random import randrange
 
 # INICIANDO O JOGO
 pygame.init()
+pygame.font.init()
+
+font_name = pygame.font.get_default_font()
+game_font = pygame.font.SysFont(font_name, 100)
 
 # DETALHES DA TELA: LARGURA E ALTURA
 LARGURA = 750 
@@ -33,6 +37,18 @@ foguete = {
 		'y': 0
 	}
 }
+
+# EXPLOSÃO DO FOGUETE
+explosao_foguete = {
+	'surface': pygame.image.load('kaban1.png').convert_alpha(),
+	'position': [],
+	'speed': {
+		'x': 0,
+		'y': 0
+	},
+	'rect': Rect(0, 0, 300, 300)
+}
+
 
 # NOME DO JOGO: NAO SEI AINDA!
 pygame.display.set_caption('SIMULADOR DE CARGA')
@@ -92,6 +108,7 @@ def conservacaoDeCargas(cargaInicial):
 # MOVIMENTAÇÃO DO JOGO
 clock = pygame.time.Clock()
 collided = False
+collision_animation_count = 0
 
 while True:
 	
@@ -133,7 +150,7 @@ while True:
 		
 	tela.blit(imagem_fundo, (0, 0))
 	
-	# MOVIMENTO DO FOGUETE
+	# MOVIMENTO DO FOGUETE E DETECTAR COLISÕES
 	if not collided:
 		collided = foguete_colisao()
 		foguete['position'][0] += foguete['speed']['x']
@@ -152,14 +169,25 @@ while True:
 			
 		if foguete['position'][1] < 10:
 			foguete['position'][1] += 10
-		
+	else:
+		if collision_animation_count == 3:
+			text = game_font.render('GAME OVER', 1, (255, 0, 0))
+			tela.blit(text, (150, 250))
+		else:
+			#FRAME DA EXPLOSÃO
+			explosao_foguete['rect'].x = collision_animation_count * 300
+			explosao_foguete['position'] = foguete['position']
+			tela.blit(explosao_foguete['surface'], explosao_foguete['position'], explosao_foguete['rect'])
+			collision_animation_count += 1
+			
 	# INICIAR FOGUETE NA POSIÇÃO 40 x 300 NA TELA
-	#tela.blit(foguete['surface'], foguete['position'])
+	
 	mover_meteoros()
 	
 	for meteoro in listaMeteoros:
 		tela.blit(meteoro['surface'], meteoro['position'])
 		
 	pygame.display.update()
-	tempo = clock.tick(30)
+	tempo = clock.tick(20)
+	
 	remove_meteoros()
