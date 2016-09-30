@@ -34,6 +34,29 @@ foguete_posicao = [40, 300]
 pygame.display.set_caption('SIMULADOR DE CARGA')
 
 
+# MOVIMENTO DE METEOROS
+def criarMeteoro():
+	return {
+		'surface': pygame.image.load("meteoroA.png"),
+		'position': [750, randrange(600)],
+		'speed': randrange(9)
+	}
+	
+mAmarelo = []
+
+def mover_meteoros():
+	for meteoro in mAmarelo:
+		meteoro['position'][0] -= meteoro['speed']
+
+
+def remove_meteoros():
+	for meteoro in mAmarelo:
+		if meteoro['position'][0] > 750:
+			mAmarelo.remove(meteoro)
+			
+velocidade_meteoroA = 120
+
+
 # MOVIMENTAÇÃO DO JOGO
 clock = pygame.time.Clock()
 
@@ -46,9 +69,19 @@ while True:
 	for event in pygame.event.get():
 		if event.type == QUIT:
 			exit()
-	
+			
+	if not velocidade_meteoroA:
+		velocidade_meteoroA = 120
+		mAmarelo.append(criarMeteoro())
+	else:
+		velocidade_meteoroA -= 1
+		
+		
 	# COMANDOS ATRAVÉS DAS TECLAS
 	pressed_keys = pygame.key.get_pressed()
+	
+	if pressed_keys[K_SPACE]:
+		break
 	
 	if pressed_keys[K_UP]:
 		velocidade['y'] = -10
@@ -83,5 +116,11 @@ while True:
 		
 		
 	tela.blit(foguete, foguete_posicao)
+	
+	mover_meteoros()
+	
+	for meteoro in mAmarelo:
+		tela.blit(meteoro['surface'], meteoro['position'])
+		
 	pygame.display.update()
 	tempo = clock.tick(30)
