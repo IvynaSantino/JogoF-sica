@@ -61,6 +61,21 @@ def remove_meteoros():
 velocidade_meteoroA = 120
 
 
+# DETECTAR COLISÕES
+def get_rect(obj):
+	return Rect(obj['position'][0],
+				obj['position'][1],
+				obj['surface'].get_width(),
+				obj['surface'].get_height())
+
+def foguete_colisao():
+	foguete_rect = get_rect(foguete)
+	
+	for meteoro in listaMeteoros:
+		if foguete_rect.colliderect(get_rect(meteoro)):
+			return True
+	return False
+
 # INICIANDO A CARGA DO FOGUETE
 cargaInicial = 10.0
 def conservacaoDeCargas(cargaInicial):
@@ -76,6 +91,7 @@ def conservacaoDeCargas(cargaInicial):
 
 # MOVIMENTAÇÃO DO JOGO
 clock = pygame.time.Clock()
+collided = False
 
 while True:
 	
@@ -118,24 +134,27 @@ while True:
 	tela.blit(imagem_fundo, (0, 0))
 	
 	# MOVIMENTO DO FOGUETE
-	foguete['position'][0] += foguete['speed']['x']
-	foguete['position'][1] += foguete['speed']['y']
-	
-	# NÃO ULTRAPASSAR A TELA
-	if foguete['position'][0] > 550:
-		foguete['position'][0] -= 10
+	if not collided:
+		collided = foguete_colisao()
+		foguete['position'][0] += foguete['speed']['x']
+		foguete['position'][1] += foguete['speed']['y']
+		tela.blit(foguete['surface'], foguete['position'])
 		
-	if foguete['position'][0] < 5:
-		foguete['position'][0] += 10
-		
-	if foguete['position'][1] > 500:
-		foguete['position'][1] -= 10
-		
-	if foguete['position'][1] < 10:
-		foguete['position'][1] += 10
+		# NÃO ULTRAPASSAR A TELA
+		if foguete['position'][0] > 550:
+			foguete['position'][0] -= 10
+			
+		if foguete['position'][0] < 5:
+			foguete['position'][0] += 10
+			
+		if foguete['position'][1] > 500:
+			foguete['position'][1] -= 10
+			
+		if foguete['position'][1] < 10:
+			foguete['position'][1] += 10
 		
 	# INICIAR FOGUETE NA POSIÇÃO 40 x 300 NA TELA
-	tela.blit(foguete['surface'], foguete['position'])
+	#tela.blit(foguete['surface'], foguete['position'])
 	mover_meteoros()
 	
 	for meteoro in listaMeteoros:
@@ -143,3 +162,4 @@ while True:
 		
 	pygame.display.update()
 	tempo = clock.tick(30)
+	remove_meteoros()
