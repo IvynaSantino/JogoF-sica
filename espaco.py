@@ -150,7 +150,22 @@ colisao_animation_carga = 0
 velocidade_carga = 120
 colisaoCarga = False
 
+WINDOWWIDTH = 750
+WINDOWHEIGHT = 600
+TEXTCOLOR = (255, 255, 255)
+BACKGROUNDCOLOR = (0, 0, 0)
+
+def drawText(text, font, surface, x, y):
+	textobj = font.render(text, 1, TEXTCOLOR)
+	textrect = textobj.get_rect()
+	textrect.topleft = (x, y)
+	surface.blit(textobj, textrect)
+	
+font = pygame.font.SysFont(None, 30)
+windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+
 while True:
+	
 	
 	foguete['speed'] = {
 	'x': 0,
@@ -160,8 +175,7 @@ while True:
 	for event in pygame.event.get():
 		if event.type == QUIT:
 			exit()
-	
-	#print conservacaoDeCargas(cargaInicial)
+
 			
 	if not velocidade_meteoroA:
 		velocidade_meteoroA = 120
@@ -198,6 +212,8 @@ while True:
 	tela.blit(imagem_fundo, (0, 0))
 	
 	# MOVIMENTO DO FOGUETE E DETECTAR COLISÕES
+	
+	
 	if not collided:
 		collided = foguete_colisao()
 		
@@ -220,10 +236,13 @@ while True:
 					cargas_conserva['position'] = foguete['position']
 					
 					colisao_animation_carga += 1		
-			
+				colisaoCarga = False
 			colisao_animation_carga = 0
-			colisaoCarga = False
 			
+		
+		drawText("Carga Inicial: 10.0 C", font, windowSurface, 10, 0)
+		drawText("Carga apos colisao: %s C" % (cargaInicial), font, windowSurface, 10, 30)
+		
 		# NÃO ULTRAPASSAR A TELA
 		if foguete['position'][0] > 550:
 			foguete['position'][0] -= 10
@@ -264,4 +283,3 @@ while True:
 	
 	remove_meteoros()
 	removeCarga()
-
